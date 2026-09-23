@@ -95,28 +95,21 @@ export default function ContactPage() {
     setSubmitStatus("submitting");
 
     try {
-      const endpoint = process.env.NEXT_PUBLIC_CMS_CONTACT_ENDPOINT
-        ?? "http://localhost:3000/api/contact-inquiries";
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: data.get("name"),
-          company: data.get("company"),
-          email: data.get("email"),
-          phone: data.get("phone"),
-          projectType: data.get("projectType"),
-          timeline: data.get("timeline"),
-          message: data.get("message"),
-        }),
+      const { submitContact } = await import("@/lib/api");
+      await submitContact({
+        name: String(data.get("name") ?? ""),
+        email: String(data.get("email") ?? ""),
+        company: String(data.get("company") ?? ""),
+        phone: String(data.get("phone") ?? ""),
+        project_type: String(data.get("projectType") ?? ""),
+        timeline: String(data.get("timeline") ?? ""),
+        message: String(data.get("message") ?? ""),
       });
-
-      if (!response.ok) throw new Error("Unable to save inquiry");
-
+    } catch {
+      // Best-effort saving to backend; fall through to open mailto client
+    } finally {
       setSubmitStatus("idle");
       window.location.href = `mailto:renanda@utamavisual.com?subject=${subject}&body=${body}`;
-    } catch {
-      setSubmitStatus("error");
     }
   };
 

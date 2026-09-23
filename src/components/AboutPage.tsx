@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useGSAP } from "@gsap/react";
@@ -8,6 +8,15 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
+
+type AboutLive = {
+  hero?: { eyebrow?: string; title?: string; description?: string; image?: { src?: string; alt?: string } };
+  story?: { eyebrow?: string; title?: string; paragraphs?: string[]; stats?: { value?: string; label?: string }[]; image?: { src?: string; alt?: string } };
+  quote?: { eyebrow?: string; text?: string };
+  principles?: { eyebrow?: string; title?: string; description?: string; items?: { title?: string; description?: string }[] };
+  capabilities?: { eyebrow?: string; title?: string; description?: string; visualLabel?: string; services?: string[]; image?: { src?: string; alt?: string } };
+  process?: { eyebrow?: string; title?: string; description?: string; steps?: { title?: string; description?: string }[] };
+};
 
 const principles = [
   {
@@ -45,6 +54,91 @@ const process = [
 
 export default function AboutPage() {
   const pageRef = useRef<HTMLDivElement>(null);
+  const [live, setLive] = useState<AboutLive | null>(null);
+
+  // BE-first content (GET /about); hardcoded fallback = original content.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { fetchAbout, unwrapItem } = await import("@/lib/api");
+        const item = unwrapItem(await fetchAbout()) as AboutLive | null;
+        if (item && !cancelled) setLive(item);
+      } catch {
+        // keep fallback
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const hero = {
+    eyebrow: live?.hero?.eyebrow ?? "About Senja · Jakarta, Indonesia",
+    title: live?.hero?.title ?? "Technology, made to feel human.",
+    description:
+      live?.hero?.description ??
+      "We design and integrate connected spaces where technology feels intuitive, purposeful, and quietly powerful.",
+    image: live?.hero?.image?.src ?? "/images/4.png",
+    imageAlt: live?.hero?.image?.alt ?? "People collaborating in a meeting room powered by Senja technology",
+  };
+  const story = {
+    eyebrow: live?.story?.eyebrow ?? "Why we exist",
+    title:
+      live?.story?.title ??
+      "A better space doesn't ask people to understand the technology.",
+    titleEm: "It understands them.",
+    paragraphs: live?.story?.paragraphs ?? [
+      "Senja brings technology, spatial thinking, and human needs into one integrated experience. We work across the entire journey—from the first conversation and system design to installation and long-term support.",
+      "The result is not a collection of devices. It is a space where ideas move more freely, teams collaborate naturally, and every interaction feels considered.",
+    ],
+    stats: live?.story?.stats ?? [
+      { value: "50+", label: "Spaces transformed" },
+      { value: "12", label: "Technology partners" },
+      { value: "04", label: "Industries served" },
+    ],
+  };
+  const quote = {
+    eyebrow: live?.quote?.eyebrow ?? "Our point of view",
+    text:
+      live?.quote?.text ??
+      "The best technology doesn't take over the room. It gives the room more possibility.",
+  };
+  const principleSection = {
+    eyebrow: live?.principles?.eyebrow ?? "What guides us",
+    title: live?.principles?.title ?? "Our principles",
+    description: live?.principles?.description ?? "Simple ideas that shape every space we create.",
+  };
+  const principleItems = (live?.principles?.items ?? []).length
+    ? live!.principles!.items!.map((it, i) => ({
+        number: String(i + 1).padStart(2, "0"),
+        title: it.title ?? "",
+        copy: it.description ?? "",
+      }))
+    : principles;
+  const capabilitySection = {
+    eyebrow: live?.capabilities?.eyebrow ?? "What we connect",
+    title: live?.capabilities?.title ?? "One partner. Every layer.",
+    description:
+      live?.capabilities?.description ??
+      "From a single meeting room to an entire connected workplace, we make every layer work together as one clear experience.",
+    visualLabel: live?.capabilities?.visualLabel ?? "Spaces / systems / experiences",
+    image: live?.capabilities?.image?.src ?? "/images/3.png",
+    imageAlt: live?.capabilities?.image?.alt ?? "Integrated technology in a compact meeting room",
+  };
+  const capabilityItems = live?.capabilities?.services ?? [...capabilities];
+  const processSection = {
+    eyebrow: live?.process?.eyebrow ?? "How we work",
+    title: live?.process?.title ?? "From intent to impact.",
+    description: live?.process?.description ?? "A collaborative process with clarity at every step.",
+  };
+  const processItems = (live?.process?.steps ?? []).length
+    ? live!.process!.steps!.map((st, i) => ({
+        number: String(i + 1).padStart(2, "0"),
+        title: st.title ?? "",
+        copy: st.description ?? "",
+      }))
+    : process;
 
   useGSAP(
     () => {
@@ -111,8 +205,8 @@ export default function AboutPage() {
       <section className="about-page__hero" data-about-page-hero aria-labelledby="about-page-title">
         <div className="about-page__hero-media" data-about-page-hero-image>
           <Image
-            src="/images/4.png"
-            alt="People collaborating in a meeting room powered by Senja technology"
+            src={hero.image}
+            alt={hero.imageAlt}
             fill
             priority
             sizes="100vw"
@@ -121,15 +215,22 @@ export default function AboutPage() {
         <div className="about-page__hero-shade" />
 
         <div className="about-page__hero-copy">
-          <p data-about-page-kicker>About Senja · Jakarta, Indonesia</p>
+          <p data-about-page-kicker>{hero.eyebrow}</p>
           <h1 id="about-page-title" data-about-page-title>
-            <span>Technology,</span>
-            <span>made to feel</span>
-            <span><em>human.</em></span>
+            {live?.hero?.title ? (
+              hero.title.split(",").map((part, i, arr) => (
+                <span key={i}>{i < arr.length - 1 ? `${part.trim()},` : part.trim()}</span>
+              ))
+            ) : (
+              <>
+                <span>Technology,</span>
+                <span>made to feel</span>
+                <span><em>human.</em></span>
+              </>
+            )}
           </h1>
           <p data-about-page-lead>
-            We design and integrate connected spaces where technology feels
-            intuitive, purposeful, and quietly powerful.
+            {hero.description}
           </p>
         </div>
 
@@ -140,28 +241,21 @@ export default function AboutPage() {
 
       <section className="about-page__story" aria-labelledby="about-story-title">
         <div data-about-page-reveal>
-          <p className="about-page__eyebrow">Why we exist</p>
+          <p className="about-page__eyebrow">{story.eyebrow}</p>
           <h2 id="about-story-title">
-            A better space doesn&apos;t ask people to understand the technology.
-            <em> It understands them.</em>
+            {story.title}
+            <em> {story.titleEm}</em>
           </h2>
         </div>
         <div className="about-page__story-copy" data-about-page-reveal>
-          <p>
-            Senja brings technology, spatial thinking, and human needs into one
-            integrated experience. We work across the entire journey—from the
-            first conversation and system design to installation and long-term support.
-          </p>
-          <p>
-            The result is not a collection of devices. It is a space where ideas
-            move more freely, teams collaborate naturally, and every interaction
-            feels considered.
-          </p>
+          {story.paragraphs.map((p, i) => (
+            <p key={i}>{p}</p>
+          ))}
         </div>
         <dl className="about-page__metrics" data-about-page-reveal>
-          <div><dt>50+</dt><dd>Spaces transformed</dd></div>
-          <div><dt>12</dt><dd>Technology partners</dd></div>
-          <div><dt>04</dt><dd>Industries served</dd></div>
+          {story.stats.map((s) => (
+            <div key={s.label}><dt>{s.value}</dt><dd>{s.label}</dd></div>
+          ))}
         </dl>
       </section>
 
@@ -170,23 +264,27 @@ export default function AboutPage() {
           <Image src="/images/1.png" alt="Modern connected executive meeting space" fill sizes="100vw" />
         </div>
         <div className="about-page__manifesto-shade" />
-        <p>Our point of view</p>
-        <blockquote>
-          The best technology doesn&apos;t take over the room.
-          <span> It gives the room more possibility.</span>
-        </blockquote>
+        <p>{quote.eyebrow}</p>
+        {live?.quote?.text ? (
+          <blockquote>{quote.text}</blockquote>
+        ) : (
+          <blockquote>
+            The best technology doesn&apos;t take over the room.
+            <span> It gives the room more possibility.</span>
+          </blockquote>
+        )}
       </section>
 
       <section className="about-page__principles" aria-labelledby="about-principles-title">
         <div className="about-page__section-head" data-about-page-reveal>
           <div>
-            <p className="about-page__eyebrow">What guides us</p>
-            <h2 id="about-principles-title">Our principles</h2>
+            <p className="about-page__eyebrow">{principleSection.eyebrow}</p>
+            <h2 id="about-principles-title">{principleSection.title}</h2>
           </div>
-          <p>Simple ideas that shape every space we create.</p>
+          <p>{principleSection.description}</p>
         </div>
         <div className="about-page__principles-grid">
-          {principles.map((principle) => (
+          {principleItems.map((principle) => (
             <article key={principle.number} data-about-principle>
               <span>{principle.number}</span>
               <div>
@@ -200,18 +298,17 @@ export default function AboutPage() {
 
       <section className="about-page__capabilities" aria-labelledby="about-capabilities-title">
         <div className="about-page__capability-media" data-about-capability-image data-about-page-reveal>
-          <Image src="/images/3.png" alt="Integrated technology in a compact meeting room" fill sizes="(max-width: 820px) 100vw, 52vw" />
-          <span>Spaces / systems / experiences</span>
+          <Image src={capabilitySection.image} alt={capabilitySection.imageAlt} fill sizes="(max-width: 820px) 100vw, 52vw" />
+          <span>{capabilitySection.visualLabel}</span>
         </div>
         <div className="about-page__capability-copy" data-about-page-reveal>
-          <p className="about-page__eyebrow">What we connect</p>
+          <p className="about-page__eyebrow">{capabilitySection.eyebrow}</p>
           <h2 id="about-capabilities-title">One partner.<br /><em>Every layer.</em></h2>
           <p>
-            From a single meeting room to an entire connected workplace, we make
-            every layer work together as one clear experience.
+            {capabilitySection.description}
           </p>
           <ul>
-            {capabilities.map((capability, index) => (
+            {capabilityItems.map((capability, index) => (
               <li key={capability}><span>0{index + 1}</span>{capability}</li>
             ))}
           </ul>
@@ -221,13 +318,13 @@ export default function AboutPage() {
       <section className="about-page__process" aria-labelledby="about-process-title">
         <div className="about-page__section-head" data-about-page-reveal>
           <div>
-            <p className="about-page__eyebrow">How we work</p>
+            <p className="about-page__eyebrow">{processSection.eyebrow}</p>
             <h2 id="about-process-title">From intent<br />to impact.</h2>
           </div>
-          <p>A collaborative process with clarity at every step.</p>
+          <p>{processSection.description}</p>
         </div>
         <div className="about-page__process-grid" data-about-page-reveal>
-          {process.map((step) => (
+          {processItems.map((step) => (
             <article key={step.number}>
               <span>{step.number}</span>
               <h3>{step.title}</h3>

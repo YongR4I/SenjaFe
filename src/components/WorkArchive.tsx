@@ -8,9 +8,10 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   projectCategories,
-  projects,
+  projects as fallbackProjects,
   type ProjectCategory,
 } from "@/data/projects";
+import { useProjects } from "@/hooks/use-cms";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -42,8 +43,10 @@ export default function WorkArchive() {
   const pageRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const [activeCategory, setActiveCategory] = useState<ProjectCategory>("All");
+  const liveProjects = useProjects();
 
-  const visibleProjects = projects.filter(
+  const source = liveProjects.length > 0 ? liveProjects : fallbackProjects;
+  const visibleProjects = source.filter(
     (project) => activeCategory === "All" || project.category === activeCategory,
   );
   const projectComposition = createProjectComposition(visibleProjects.length);

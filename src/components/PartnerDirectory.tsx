@@ -6,7 +6,8 @@ import Link from "next/link";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { technologyPartners } from "@/data/partners";
+import { technologyPartners as fallbackPartners } from "@/data/partners";
+import { usePartners } from "@/hooks/use-cms";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -15,10 +16,12 @@ export default function PartnerDirectory() {
   const gridRef = useRef<HTMLDivElement>(null);
   const [partnerSearch, setPartnerSearch] = useState("");
   const normalizedSearch = partnerSearch.trim().toLocaleLowerCase();
+  const livePartners = usePartners();
+  const source = livePartners.length > 0 ? livePartners : fallbackPartners;
 
-  const visiblePartners = technologyPartners.filter((partner) =>
-    [partner.name, partner.category, partner.description, ...partner.capabilities].some(
-      (value) => value.toLocaleLowerCase().includes(normalizedSearch),
+  const visiblePartners = source.filter((partner) =>
+    [partner.name, partner.category ?? "", partner.description, ...(partner.capabilities ?? [])].some(
+      (value) => String(value).toLocaleLowerCase().includes(normalizedSearch),
     ),
   );
 
@@ -91,9 +94,9 @@ export default function PartnerDirectory() {
         </div>
 
         <div className="partner-directory__floating-logos" aria-hidden="true">
-          {technologyPartners.slice(0, 3).map((partner) => (
+          {source.slice(0, 3).map((partner) => (
             <div key={partner.name} data-floating-logo>
-              <Image src={partner.image} alt="" width={180} height={100} />
+              <Image src={typeof partner.image === "string" ? partner.image : "/images/partners-1.png"} alt="" width={180} height={100} />
             </div>
           ))}
         </div>
@@ -166,13 +169,13 @@ export default function PartnerDirectory() {
                 <span>{partner.category}</span>
               </div>
               <div className="partner-directory-card__logo">
-                <Image src={partner.image} alt={`${partner.name} logo`} width={260} height={150} />
+                <Image src={typeof partner.image === "string" ? partner.image : "/images/partners-1.png"} alt={`${partner.name} logo`} width={260} height={150} />
               </div>
               <div className="partner-directory-card__copy">
                 <h3>{partner.name}</h3>
                 <p>{partner.description}</p>
                 <ul>
-                  {partner.capabilities.map((capability) => <li key={capability}>{capability}</li>)}
+                  {(partner.capabilities ?? []).map((capability) => <li key={String(capability)}>{String(capability)}</li>)}
                 </ul>
               </div>
             </Link>

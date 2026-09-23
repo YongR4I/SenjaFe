@@ -6,7 +6,8 @@ import Link from "next/link";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { technologyPartners } from "@/data/partners";
+import { technologyPartners as fallbackPartners } from "@/data/partners";
+import { usePartners } from "@/hooks/use-cms";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -15,6 +16,8 @@ export default function Partners() {
   const trackRef = useRef<HTMLDivElement>(null);
   const firstGroupRef = useRef<HTMLDivElement>(null);
   const marqueeTweenRef = useRef<gsap.core.Tween | null>(null);
+  const livePartners = usePartners();
+  const partners = livePartners.length > 0 ? livePartners : fallbackPartners;
 
   useGSAP(
     () => {
@@ -136,7 +139,7 @@ export default function Partners() {
                 className="partners__group"
                 aria-hidden={groupIndex === 1}
               >
-                {technologyPartners.map((partner) => (
+                {partners.map((partner) => (
                   <Link
                     key={`${groupIndex}-${partner.name}`}
                     href={`/partners/${partner.slug}`}

@@ -5,20 +5,32 @@ import Footer from "@/components/Footer";
 import Navigation from "@/components/Navigation";
 import PartnerDetail from "@/components/PartnerDetail";
 import { getPartnerBySlug, technologyPartners } from "@/data/partners";
+import { fetchPartner } from "@/lib/api";
+import { mapPartner } from "@/lib/mappers";
 
 type PartnerPageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export const dynamicParams = false;
+export const dynamicParams = true;
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
   return technologyPartners.map((partner) => ({ slug: partner.slug }));
+}
+
+async function getPartner(slug: string) {
+  try {
+    const item = await fetchPartner(slug);
+    if (item && typeof item === "object") return mapPartner(item as Record<string, unknown>);
+  } catch {
+    // offline → static fallback below
+  }
+  return getPartnerBySlug(slug) ?? null;
 }
 
 export async function generateMetadata({ params }: PartnerPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const partner = getPartnerBySlug(slug);
+  const partner = await getPartner(slug);
 
   if (!partner) return { title: "Partner not found | Senja" };
 
@@ -30,12 +42,15 @@ export async function generateMetadata({ params }: PartnerPageProps): Promise<Me
 
 export default async function PartnerPage({ params }: PartnerPageProps) {
   const { slug } = await params;
-  const partner = getPartnerBySlug(slug);
+  const partner = await getPartner(slug);
 
   if (!partner) notFound();
 
-  const currentIndex = technologyPartners.findIndex((item) => item.slug === partner.slug);
-  const nextPartner = technologyPartners[(currentIndex + 1) % technologyPartners.length];
+  const pool = technologyPartners.some((item) => item.slug === partner.slug)
+    ? technologyPartners
+    : [partner, ...technologyPartners];
+  const currentIndex = pool.findIndex((item) => item.slug === partner.slug);
+  const nextPartner = pool[(currentIndex + 1) % pool.length];
 
   return (
     <>
