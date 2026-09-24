@@ -30,7 +30,13 @@ export function unwrapItem<T>(json: unknown): T | null {
 
 async function getJSON(path: string): Promise<unknown | null> {
   try {
-    const res = await fetch(`${API_URL}${path}`, { next: { revalidate: 60 } });
+    const isServer = typeof window === "undefined";
+    const res = await fetch(
+      `${API_URL}${path}`,
+      isServer
+        ? { next: { revalidate: 60 } }
+        : { cache: "no-store" },
+    );
     if (!res.ok) return null;
     return await res.json();
   } catch {

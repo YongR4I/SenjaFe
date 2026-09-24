@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import SafeImage from "@/components/SafeImage";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -122,8 +122,9 @@ export default function Hero() {
   return (
     <section ref={heroRef} className="hero" aria-labelledby="hero-title">
       <div className="hero__media" data-hero-parallax>
-        <Image
+        <SafeImage
           src={copy.image}
+          fallbackSrc="/images/1.png"
           alt={copy.imageAlt}
           fill
           preload

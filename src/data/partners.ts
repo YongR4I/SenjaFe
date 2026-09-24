@@ -21,6 +21,21 @@ export type TechnologyPartner = {
   }[];
 };
 
+export const partnerLogoFallbacks: Record<string, string> = {
+  panasonic: "/images/partners-4.png",
+  "tp-link": "/images/partners-3.png",
+  logitech: "/images/partners-1.png",
+  benq: "/images/partners-2.png",
+  epson: "/images/partners-5.png",
+};
+
+const DEFAULT_PARTNER_LOGO = "/images/partners-1.png";
+
+export function partnerLogoFallback(slug?: string): string {
+  if (slug && partnerLogoFallbacks[slug]) return partnerLogoFallbacks[slug];
+  return DEFAULT_PARTNER_LOGO;
+}
+
 export const technologyPartners: TechnologyPartner[] = [
   {
     slug: "panasonic",

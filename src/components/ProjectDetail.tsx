@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type { Project } from "@/data/projects";
+import { partnerLogoFallback } from "@/data/partners";
+import SafeImage from "@/components/SafeImage";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -127,7 +128,7 @@ export default function ProjectDetail({ project, nextProject }: ProjectDetailPro
     <article ref={pageRef} className="project-detail">
       <section className="project-detail__hero" data-detail-hero aria-labelledby="project-title">
         <div className="project-detail__hero-media" data-detail-hero-image>
-          <Image src={project.image} alt={project.title} fill priority sizes="100vw" />
+          <SafeImage src={project.image} fallbackSrc="/images/2.png" alt={project.title} fill priority sizes="100vw" />
         </div>
         <div className="project-detail__hero-shade" />
 
@@ -207,8 +208,9 @@ export default function ProjectDetail({ project, nextProject }: ProjectDetailPro
                 onClick={() => openLightbox(index)}
                 aria-label={`Open image ${index + 1}: ${image.alt}`}
               >
-                <Image
+                <SafeImage
                   src={image.src}
+                  fallbackSrc="/images/2.png"
                   alt=""
                   fill
                   sizes={index === 0 ? "(max-width: 820px) 100vw, 86vw" : "(max-width: 820px) 100vw, 43vw"}
@@ -253,8 +255,9 @@ export default function ProjectDetail({ project, nextProject }: ProjectDetailPro
           </button>
 
           <div className="project-lightbox__media">
-            <Image
+            <SafeImage
               src={activeGalleryImage.src}
+              fallbackSrc="/images/2.png"
               alt=""
               fill
               sizes="100vw"
@@ -304,8 +307,9 @@ export default function ProjectDetail({ project, nextProject }: ProjectDetailPro
               className="project-partner-card"
             >
               <span>0{index + 1}</span>
-              <Image
+              <SafeImage
                 src={partner.image}
+                fallbackSrc={partnerLogoFallback(partner.slug)}
                 alt={`${partner.name} logo`}
                 width={220}
                 height={120}

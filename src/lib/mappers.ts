@@ -4,6 +4,7 @@
  */
 import type { Project } from "@/data/projects";
 import type { TechnologyPartner } from "@/data/partners";
+import { partnerLogoFallback } from "@/data/partners";
 
 function str(v: unknown, fallback = ""): string {
   return typeof v === "string" ? v : fallback;
@@ -43,7 +44,7 @@ export function mapProject(p: Record<string, unknown>): Project {
     partners: Array.isArray(p.partners)
       ? (p.partners as Record<string, unknown>[]).map((x) => ({
           name: str(x.name),
-          image: img(x.image ?? x.logo, "/images/partners-1.png"),
+          image: img(x.image ?? x.logo, partnerLogoFallback(str(x.slug))),
           slug: str(x.slug),
         }))
       : [],
@@ -59,11 +60,12 @@ export function mapProject(p: Record<string, unknown>): Project {
 }
 
 export function mapPartner(p: Record<string, unknown>): TechnologyPartner {
+  const slug = str(p.slug);
   return {
-    slug: str(p.slug),
+    slug,
     number: str(p.number, "00"),
     name: str(p.name, "Partner"),
-    image: img(p.image ?? p.logo, "/images/partners-1.png"),
+    image: img(p.image ?? p.logo, partnerLogoFallback(slug)),
     category: (p.category as TechnologyPartner["category"]) ?? "Display",
     description: str(p.description),
     capabilities: Array.isArray(p.capabilities) ? (p.capabilities as unknown[]).map(String) : [],

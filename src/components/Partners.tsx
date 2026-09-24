@@ -1,13 +1,13 @@
 "use client";
 
 import { useRef } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { technologyPartners as fallbackPartners } from "@/data/partners";
+import { technologyPartners as fallbackPartners, partnerLogoFallback } from "@/data/partners";
 import { usePartners } from "@/hooks/use-cms";
+import SafeImage from "@/components/SafeImage";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -147,8 +147,9 @@ export default function Partners() {
                     data-partner-card
                     tabIndex={groupIndex === 1 ? -1 : undefined}
                   >
-                    <Image
+                    <SafeImage
                       src={partner.image}
+                      fallbackSrc={partnerLogoFallback(partner.slug)}
                       alt={groupIndex === 0 ? `${partner.name} logo` : ""}
                       width={200}
                       height={122}

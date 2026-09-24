@@ -2,12 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { KeyboardEvent } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type { TechnologyPartner } from "@/data/partners";
+import { partnerLogoFallback } from "@/data/partners";
+import SafeImage from "@/components/SafeImage";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -166,7 +167,7 @@ export default function PartnerDetail({ partner, nextPartner }: PartnerDetailPro
     <article ref={pageRef} className="brand-detail">
       <section className="brand-detail__hero" data-brand-hero aria-labelledby="brand-detail-title">
         <div className="brand-detail__hero-media" data-brand-hero-image>
-          <Image src={partner.heroImage} alt={`${partner.name} technology integrated by Senja`} fill priority sizes="100vw" />
+          <SafeImage src={partner.heroImage} fallbackSrc="/images/2.png" alt={`${partner.name} technology integrated by Senja`} fill priority sizes="100vw" />
         </div>
         <div className="brand-detail__hero-shade" />
         <Link href="/partners#partner-directory-list" className="brand-detail__back" data-brand-back>
@@ -175,7 +176,7 @@ export default function PartnerDetail({ partner, nextPartner }: PartnerDetailPro
 
         <div className="brand-detail__hero-copy">
           <div className="brand-detail__hero-logo" data-brand-logo>
-            <Image src={partner.image} alt={`${partner.name} logo`} width={260} height={150} />
+            <SafeImage src={partner.image} fallbackSrc={partnerLogoFallback(partner.slug)} alt={`${partner.name} logo`} width={260} height={150} />
           </div>
           <p data-brand-kicker>{partner.category} partner · {partner.number}</p>
           <h1 id="brand-detail-title" data-brand-title>
@@ -207,8 +208,9 @@ export default function PartnerDetail({ partner, nextPartner }: PartnerDetailPro
       </section>
 
       <figure className="brand-detail__feature-image" data-brand-image>
-        <Image
+        <SafeImage
           src={partner.gallery[0].src}
+          fallbackSrc="/images/2.png"
           alt={partner.gallery[0].alt}
           fill
           sizes="100vw"
@@ -384,10 +386,10 @@ export default function PartnerDetail({ partner, nextPartner }: PartnerDetailPro
           {visibleProducts.map((product, index) => (
             <article key={`${activeSegment}-${product.name}`} className="brand-product-card" data-brand-reveal>
               <div className="brand-product-card__image" data-brand-image>
-                <Image src={product.image} alt={`${product.name} application environment`} fill sizes="(max-width: 820px) 100vw, 34vw" />
+                <SafeImage src={product.image} fallbackSrc="/images/2.png" alt={`${product.name} application environment`} fill sizes="(max-width: 820px) 100vw, 34vw" />
                 <span>{(index + 1).toString().padStart(2, "0")}</span>
                 <div className="brand-product-card__brand">
-                  <Image src={partner.image} alt="" width={130} height={70} />
+                  <SafeImage src={partner.image} fallbackSrc={partnerLogoFallback(partner.slug)} alt="" width={130} height={70} />
                 </div>
               </div>
               <div className="brand-product-card__copy">
@@ -429,7 +431,7 @@ export default function PartnerDetail({ partner, nextPartner }: PartnerDetailPro
           <h2>{nextPartner.name}</h2>
         </div>
         <div className="next-brand__logo">
-          <Image src={nextPartner.image} alt={`${nextPartner.name} logo`} width={180} height={100} />
+          <SafeImage src={nextPartner.image} fallbackSrc={partnerLogoFallback(nextPartner.slug)} alt={`${nextPartner.name} logo`} width={180} height={100} />
         </div>
         <span aria-hidden="true">↗</span>
       </Link>

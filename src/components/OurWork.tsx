@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useProjects } from "@/hooks/use-cms";
+import SafeImage from "@/components/SafeImage";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -124,8 +124,9 @@ export default function OurWork() {
               className={`our-work__slide ${index === activeProject ? "is-active" : ""}`}
               aria-hidden={index !== activeProject}
             >
-              <Image
+              <SafeImage
                 src={project.image}
+                fallbackSrc="/images/2.png"
                 alt={index === activeProject ? project.title : ""}
                 fill
                 sizes="(max-width: 820px) 100vw, 56vw"

@@ -1,13 +1,13 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { technologyPartners as fallbackPartners } from "@/data/partners";
+import { technologyPartners as fallbackPartners, partnerLogoFallback } from "@/data/partners";
 import { usePartners } from "@/hooks/use-cms";
+import SafeImage from "@/components/SafeImage";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -96,7 +96,7 @@ export default function PartnerDirectory() {
         <div className="partner-directory__floating-logos" aria-hidden="true">
           {source.slice(0, 3).map((partner) => (
             <div key={partner.name} data-floating-logo>
-              <Image src={typeof partner.image === "string" ? partner.image : "/images/partners-1.png"} alt="" width={180} height={100} />
+              <SafeImage src={typeof partner.image === "string" ? partner.image : partnerLogoFallback(partner.slug)} fallbackSrc={partnerLogoFallback(partner.slug)} alt="" width={180} height={100} />
             </div>
           ))}
         </div>
@@ -169,7 +169,7 @@ export default function PartnerDirectory() {
                 <span>{partner.category}</span>
               </div>
               <div className="partner-directory-card__logo">
-                <Image src={typeof partner.image === "string" ? partner.image : "/images/partners-1.png"} alt={`${partner.name} logo`} width={260} height={150} />
+                <SafeImage src={typeof partner.image === "string" ? partner.image : partnerLogoFallback(partner.slug)} fallbackSrc={partnerLogoFallback(partner.slug)} alt={`${partner.name} logo`} width={260} height={150} />
               </div>
               <div className="partner-directory-card__copy">
                 <h3>{partner.name}</h3>

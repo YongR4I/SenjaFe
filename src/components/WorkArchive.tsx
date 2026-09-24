@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
@@ -12,6 +11,7 @@ import {
   type ProjectCategory,
 } from "@/data/projects";
 import { useProjects } from "@/hooks/use-cms";
+import SafeImage from "@/components/SafeImage";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -104,8 +104,9 @@ export default function WorkArchive() {
     <div ref={pageRef} className="work-archive">
       <section className="work-archive__hero" data-work-hero aria-labelledby="work-archive-title">
         <div className="work-archive__hero-media" data-work-hero-image>
-          <Image
+          <SafeImage
             src="/images/5.png"
+            fallbackSrc="/images/5.png"
             alt="Executive boardroom with integrated collaboration technology"
             fill
             priority
@@ -186,8 +187,9 @@ export default function WorkArchive() {
                 data-project-card
               >
                 <div className="work-card__media">
-                  <Image
+                  <SafeImage
                     src={project.image}
+                    fallbackSrc="/images/2.png"
                     alt={project.title}
                     fill
                     sizes={

@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import SafeImage from "@/components/SafeImage";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -204,8 +204,9 @@ export default function AboutPage() {
     <div ref={pageRef} className="about-page">
       <section className="about-page__hero" data-about-page-hero aria-labelledby="about-page-title">
         <div className="about-page__hero-media" data-about-page-hero-image>
-          <Image
+          <SafeImage
             src={hero.image}
+            fallbackSrc="/images/4.png"
             alt={hero.imageAlt}
             fill
             priority
@@ -261,7 +262,7 @@ export default function AboutPage() {
 
       <section className="about-page__manifesto" data-about-page-reveal>
         <div className="about-page__manifesto-media">
-          <Image src="/images/1.png" alt="Modern connected executive meeting space" fill sizes="100vw" />
+          <SafeImage src="/images/1.png" fallbackSrc="/images/1.png" alt="Modern connected executive meeting space" fill sizes="100vw" />
         </div>
         <div className="about-page__manifesto-shade" />
         <p>{quote.eyebrow}</p>
@@ -298,7 +299,7 @@ export default function AboutPage() {
 
       <section className="about-page__capabilities" aria-labelledby="about-capabilities-title">
         <div className="about-page__capability-media" data-about-capability-image data-about-page-reveal>
-          <Image src={capabilitySection.image} alt={capabilitySection.imageAlt} fill sizes="(max-width: 820px) 100vw, 52vw" />
+          <SafeImage src={capabilitySection.image} fallbackSrc="/images/3.png" alt={capabilitySection.imageAlt} fill sizes="(max-width: 820px) 100vw, 52vw" />
           <span>{capabilitySection.visualLabel}</span>
         </div>
         <div className="about-page__capability-copy" data-about-page-reveal>
